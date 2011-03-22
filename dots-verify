@@ -1,0 +1,35 @@
+#!/bin/sh
+# dots-verify - verify all present dotfiles are pointing to .etc
+
+BASE=`basename $0`
+TEMPBROKE=`mktemp -t $BASE-broke` || exit 1
+TEMPLINKS=`mktemp -t $BASE-links` || exit 1
+TEMP=`mktemp -t $BASE` || exit 1
+
+cd $HOME
+for file in `dots-comm -1 -2`; do
+        if [ -L ${file} ] ; then
+                echo `readlink ${file}` ${file} >> $TEMPLINKS
+        else
+                echo ${file} >> $TEMPBROKE
+        fi
+done
+
+cat $TEMPBROKE |
+xargs lc -d
+
+# sort templinks
+cat $TEMPLINKS |
+sort > $TEMP
+mv $TEMP $TEMPLINKS
+
+DOTS_MAPPING=$HOME/.etc/dots/mapping
+cat $DOTS_MAPPING |
+grep -v '^#' | # ignore comments
+grep -v '^\s*$' | # ignore blank lines
+sort |
+comm -2 -3 $TEMPLINKS -
+
+rm $TEMPBROKE
+rm $TEMPLINKS
+cd - > /dev/null

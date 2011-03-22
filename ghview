@@ -1,0 +1,22 @@
+#!/bin/sh
+base='http://github.com'
+
+if [ $1 ]; then
+  file=`git ls-files --full-name $1`;
+fi
+
+current=`git status -s -b | head -1 | cut -d' ' -f2`
+remote=`git config branch.$current.remote`
+if [ "$remote" = "" ] ; then
+  remote='origin'
+fi
+branch=`git config branch.$current.merge | sed 's/.*\/\([^\/]*\)/\1/'`
+
+repo=`git remote -v |
+awk "\\$1 ~ /$remote/ {print \\$0}" |
+awk '$2 ~ /github/ {print $2}' |
+head -n 1 |
+sed 's/.*[:/]\([^/]*\)\/\([^\.]*\)\.git/\1\/\2\/blob/'`
+
+url=$base/$repo/$branch/$file
+open $url

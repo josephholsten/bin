@@ -1,0 +1,4 @@
+#!/bin/sh
+# dots-extra - list dotfiles in the user's home directory that weren't expected
+
+dots-comm -1 -3

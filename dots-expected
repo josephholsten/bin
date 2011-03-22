@@ -1,0 +1,11 @@
+#!/bin/sh
+# dots-expected- - print the dotfiles expected by dots with the
+#         current .dots_mapping
+
+DOTS_MAPPING=$HOME/.etc/dots/mapping
+
+cat $DOTS_MAPPING |
+grep -v '^#' | # ignore comments
+grep -v '^\s*$' | # ignore blank lines
+cut -f 2 -d ' ' |
+sort

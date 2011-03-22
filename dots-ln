@@ -1,0 +1,11 @@
+#!/bin/sh
+# dots-ln - link home directory etc and var to standard files
+
+DOTS_MAPPING=$HOME/.etc/dots/mapping
+[ -r $DOTS_MAPPING ] || exit 1
+
+cd $HOME
+
+        grep -v '^#' $DOTS_MAPPING | xargs -L1 ln -s
+
+cd -

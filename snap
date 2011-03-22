@@ -1,0 +1,13 @@
+#!/usr/local/bin/macruby
+def snip(pattern, &block)
+  @snippets ||= {}
+  @snippets[pattern] = block
+end
+
+instance_eval File.read(ENV['HOME'] + '/.snippets')
+
+ARGF.each do |line|
+  @snippets.each_pair do |pattern, block|
+    block.call($~) if line =~ pattern
+  end
+end

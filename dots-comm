@@ -1,0 +1,20 @@
+#!/bin/sh
+# dots-comm - print the difference between expected dotfiles and the actual ones
+# Passes parameters to comm
+
+BASE=`basename $0`
+TEMPEXPECTED=`mktemp -t $BASE-expected` || exit 1
+TEMPFOUND=`mktemp -t $BASE-found` || exit 1
+TEMPIGNORED=`mktemp -t $BASE-ignored` || exit 1
+
+dots-expected > $TEMPEXPECTED
+dots-ls > $TEMPFOUND
+dots-ignored > $TEMPIGNORED
+
+# remove ignored files
+comm -1 -3 $TEMPIGNORED $TEMPFOUND |
+comm $* $TEMPEXPECTED -
+
+rm $TEMPEXPECTED
+rm $TEMPFOUND
+rm $TEMPIGNORED

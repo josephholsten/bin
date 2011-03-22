@@ -1,0 +1,4 @@
+#!/bin/sh
+# dots-missing - list dotfiles in the user's home directory that weren't found
+
+dots-comm -2 -3

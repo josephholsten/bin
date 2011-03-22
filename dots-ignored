@@ -1,0 +1,9 @@
+#!/bin/sh
+# dots-ignored - list dotfiles that should be ignored by dots
+
+IGNORED=$HOME/.etc/dots/ignored
+
+cat $IGNORED |
+grep -v '^#' | # ignore comments
+grep -v '^\s*$' | # ignore blank lines
+sort
