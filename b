@@ -1,4 +1,8 @@
 #!/bin/sh
 # b - load named files in an editor
 
-exec mvim "$@"
+if [ "$1" = "" ]; then
+  exec $EDITOR .
+else
+  exec $EDITOR "$@"
+fi
