@@ -1,0 +1,3 @@
+#!/bin/sh
+# dman - open man page in dash
+exec open dash://manpages:"$@"
