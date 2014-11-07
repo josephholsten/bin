@@ -1,0 +1,13 @@
+#!/bin/sh
+# diffln - Only compare the n lines of the second file against the first.
+
+first=$1
+second=$2
+len=`wc -l $2 | awk '{print $1}'`
+tmp=/tmp/diffln.$$.$USER.out
+
+head -n `echo $len + 1 | hoc` $first > $tmp
+diff $tmp $second
+status=$?
+rm -f $tmp
+exit $status

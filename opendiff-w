@@ -1,0 +1,3 @@
+#!/bin/sh
+# opendiff-w - run opendiff in a way that doesn't appear closed immediately
+opendiff "$@" | cat

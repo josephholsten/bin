@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby -w
+# scrabble - search for useful words given the available letters
+
+require 'logger'
+log = Logger.new(STDERR)
+log.formatter = proc { |severity, datetime, progname, msg|
+    "#{msg}\n"
+}
+
+letters = {}
+ARGV[0].each_char do |c|
+  letters[c] ||= 0
+  letters[c] += 1
+end
+log.debug letters.inspect
+
+
+words = open('/usr/share/dict/words')
+while words.gets
+  catch :next do
+    log.debug any = Regexp.new("^[#{letters.keys.join}]*.[#{letters.keys.join}]*$")
+    next unless $_ =~ any
+    letregexpen = letters.each do |letter, count|
+      log.debug letregexp = Regexp.new("#{letter}.*" * (count + 1))
+      letregexp
+    end
+    letregexpen.each do |letregexp|
+      throw :next unless $_ =~ letregexp
+    end
+    puts $_
+  end
+end
+
+# cat words |
+# egrep '^[aeiogl]*g[aeiogl]*$' |
+# egrep -v 'g.*g.*g' |
+# egrep -v 'l.*l' |
+# egrep -v 'a.*a' |
+# egrep -v 'e.*e' |
+# egrep -v 'o.*o'

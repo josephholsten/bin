@@ -1,0 +1,14 @@
+#!/bin/sh
+set -x
+
+IMAGESNAP=imagesnap
+IMAGESNAPFLAGS=-q
+
+PHOTODIR=/Users/joseph/Pictures/Snapshots
+
+date=`date "+%Y-%m-%dT%H%M%S"`
+if [ ! -d $PHOTODIR ]; then
+  mkdir -p $PHOTODIR
+fi
+
+exec $IMAGESNAP $IMAGESNAPFLAGS $PHOTODIR/$date.jpeg

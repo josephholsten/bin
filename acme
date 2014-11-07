@@ -1,0 +1,3 @@
+#!/bin/sh
+# acme - ensure acme is run with the right font
+exec /opt/plan9/bin/9 acme -f /mnt/font/Menlo-Regular/14a/font

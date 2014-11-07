@@ -1,0 +1,3 @@
+#!/bin/sh
+# sorry-ci - commit whatever's in, with a terrible commit message
+hig ci -m `curl http://whatthecommit.com/index.txt`

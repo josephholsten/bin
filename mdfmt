@@ -1,0 +1,8 @@
+#!/bin/sh
+#  --to=markdown \
+#  --to=markdown_github \
+pandoc \
+  --to=markdown \
+  --reference-links \
+  --atx-headers \
+  --columns 72

@@ -1,6 +1,0 @@
-#!/bin/sh
-# dots-ls - list dotfiles in the users home directory
-
-ls -a $HOME |
-grep '^\.' |
-sort

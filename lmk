@@ -1,9 +1,11 @@
 #!/bin/sh
+# lmk - notify after a command is run
 
 $*
 
 if [ $? -eq 0 ]
-then /usr/local/bin/growlnotify -m "\"$*\" done (SUCCESS)"
+then /usr/local/bin/growlnotify -s -m "$*" "SUCCESS"
 
-else /usr/local/bin/growlnotify -m "\"$*\" done (FAILED)"
+else /usr/local/bin/growlnotify -s -m "$* returned $?" "FAIL"
 fi
+beep

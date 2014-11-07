@@ -1,0 +1,3 @@
+#!/usr/bin/env gawk -f /Users/j/.bin/titlecase.awk -f
+{ print titlecase($0) }
+

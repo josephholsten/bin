@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# ,-./0123456789;=['\]`abcdefghijklmnopqrstuvwxyz
+# w'e[0123456789z]-q\=`anihdyujgcvpmlsrxo;kf.,bt/
+
+#   we[0123456789z]-\=`anihdyujgcvpmlsrxo;kf.,bt/
+#   ,./0123456789;=[\]`abcdefghijklmnopqrstuvwxyz
+
+#   'q
+#   -'
+tr "'q"'we[0123456789z]-\=`anihdyujgcvpmlsrxo;kf.,bt/' \
+   "-'"',./0123456789;=[\]`abcdefghijklmnopqrstuvwxyz'
+
