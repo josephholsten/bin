@@ -1,0 +1,4 @@
+#!/bin/sh
+# PlistBuddy - expose internal plist tool
+
+exec /usr/libexec/PlistBuddy "$@"
