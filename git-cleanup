@@ -1,0 +1,60 @@
+#!/bin/bash
+
+set -e
+
+# cleanup a git repo, removing fully merged branches (locally and remotely)
+# based on http://devblog.springest.com/a-script-to-remove-old-git-branches
+
+# run from the repo to be cleaned
+
+# TODO: store lists of branches, DRY (don't want list to change after confirm)
+
+COMPARE_BRANCH='master' # branch to compare other branches against
+BRANCHES="master"
+
+# Update our list of remotes, fetching new, and pruning stale
+git fetch
+git remote prune origin
+
+for COMPARE_BRANCH in $BRANCHES
+do
+    echo "Cleaning up vs ${COMPARE_BRANCH}"
+    # This has to be run from branch being compared against
+    git checkout ${COMPARE_BRANCH}
+
+    # Remove local fully merged branches
+    # TODO: script will abort here if there are no local branches to remove
+    echo "The following local branches are fully merged and will be removed:"
+    git branch --merged ${COMPARE_BRANCH} | \
+        grep -v "${COMPARE_BRANCH}\$" | \
+        grep -v "master\$"
+
+    read -p "Continue (y/n)? "
+    if [ "$REPLY" == "y" ]
+    then
+        git branch --merged ${COMPARE_BRANCH} | \
+        grep -v "${COMPARE_BRANCH}\$" | \
+        grep -v "master\$" | \
+        xargs -I% git branch -d %
+    fi
+
+    # Show remote fully merged branches
+    echo "The following remote branches are fully merged and will be removed:"
+    git branch -r --merged ${COMPARE_BRANCH} | \
+        sed 's/ *origin\///' | \
+        grep -v "${COMPARE_BRANCH}\$" | \
+        grep -v "master\$"
+
+    read -p "Continue (y/n)? "
+    if [ "$REPLY" == "y" ]
+    then
+        # Remove remote fully merged branches
+        # TODO: `grep -v "master\$" : skips long-running braches that should remain. add lists
+        git branch -r --merged ${COMPARE_BRANCH} | \
+        sed 's/ *origin\///' | \
+        grep -v "${COMPARE_BRANCH}\$" | \
+        grep -v "master\$" | \
+        xargs -I% git push origin :%
+       echo "Done!"
+    fi
+done
