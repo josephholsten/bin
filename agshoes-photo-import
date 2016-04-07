@@ -1,0 +1,5 @@
+#!/bin/sh
+# TODO: use maid(1)
+set -x
+: ${PHOTOSDIR:=$HOME/Dropbox/Pictures}
+exec sortphotos --rename "%Y-%m-%dT%H%M%S" -r "$@" "$PHOTOSDIR"

@@ -1,0 +1,12 @@
+#!/bin/sh
+# cache-absent: rm cache files from home
+
+rm -rf ~/.ansible
+rm -rf ~/.bash_history
+rm -rf ~/.bash_sessions
+rm -rf ~/.bzr.log
+rm -rf ~/.lldb
+rm -rf ~/.nvimlog
+rm -rf ~/.offlineimap.pyc
+# want to keep .z history usually
+# rm -rf ~/.z

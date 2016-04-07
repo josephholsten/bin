@@ -1,0 +1,6 @@
+#!/bin/sh
+MUSIC_DIR="${HOME}/Music/iTunes/iTunes Media/Music/"
+# REMOTE_HOST='media-1.josephholsten.com'
+REMOTE_HOST='media.josephholsten.com'
+REMOTE_DIR='/var/lib/music/'
+rsync -avPpz "${MUSIC_DIR}" "${REMOTE_HOST}":"${REMOTE_DIR}"

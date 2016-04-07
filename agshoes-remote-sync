@@ -1,0 +1,26 @@
+#!/bin/sh
+# remote-sync: package up my archive of works
+
+set -e
+
+bucket=assets.josephholsten.com
+archive=/opt/archive
+
+tmp=`mktmp`
+date=`pdate`
+dated_uri=s3://${bucket}/archive/${date}.txz.gpg
+latest_uri=s3://${bucket}/archive/latest.txz.gpg
+
+cd $archive
+f |
+cpio -voJH pax > ${tmp}.txz
+gpg -passphrase "$(pass infra/final-archive)" -c < ${tmp}.txz > ${tmp}.txz.gpg
+
+
+echo $tmp
+# aws s3 mv $tmp s3://${bucket}/archive/${date}.txz.gpg --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+s3cmd put ${tmp}.txz.gpg ${dated_uri} --acl-grant=read:http://acs.amazonaws.com/groups/global/AllUsers
+# aws s3 cp s3://${bucket}/archive/${date}.txz  s3://${bucket}/archive/latest.txz.gpg --grants read=uri=http://acs.amazonaws.com/groups/global/AllUsers
+s3cmd cp ${dated_uri} ${latest.txz.gpg} --acl-grant=read:http://acs.amazonaws.com/groups/global/AllUsers
+
+rm $tmp*

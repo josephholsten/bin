@@ -1,0 +1,3 @@
+#!/bin/sh
+cd /Users/josephholsten
+exec /usr/local/bin/offlineimap -u quiet
