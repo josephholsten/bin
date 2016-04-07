@@ -1,0 +1,7 @@
+#!/bin/sh
+
+NEOVIM_PATH="$HOME/Dropbox/Mackup/.config/nvim"
+NEOVIMFS_PATH="$NEOVIM_PATH/neovimfs"
+
+killall -9 nvim
+umount "${NEOVIMFS_PATH}"

@@ -1,3 +1,0 @@
-#!/bin/sh
-# you've got a fancy terminal emulator
-exec cat

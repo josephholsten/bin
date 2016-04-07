@@ -1,6 +1,0 @@
-#!/bin/sh
-
-cat ~/.ical |
-xargs curl -s |
-ics2rem |
-grep -v 'MSG Calendar Events' > ~/.ics2rem

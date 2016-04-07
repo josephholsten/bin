@@ -1,5 +1,5 @@
 #!/bin/sh
 # whitespace - remove trailing whitespace from from files
 find . -type f |
-egrep '\.(js|coffee|html|rb|css|pl|sh)$' |
+egrep '\.(js|tf|json|coffee|html|rb|css|pl|sh)$' |
 xargs sed -i '' 's/ *$//g'

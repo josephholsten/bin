@@ -1,0 +1,3 @@
+#!/bin/sh
+export PASSWORD_STORE_DIR="/Volumes/Imation USB/password-store"
+exec pass "$@"

@@ -1,0 +1,98 @@
+#!/bin/bash
+# view-attachment - handle mail attachments
+#
+# SYNOPSIS
+#     view-attachment file [type] [open-with]
+#
+# DESCRIPTION
+# To be called by mutt as indicated by .mailcap to handle mail attachments.
+# Copy the given file to a temporary directory so mutt won't delete it before it is read by the application.
+#
+# Along the way, discern the file type or use the type that is given.
+#
+# Finally use 'open' or 'open -a' if the third argument is given.
+#
+# type         for those times when file magic isn't enough. HTML mail
+#              frequently has no extension and file can't figure out what
+#              it is. Set to '-' if you don't want the type to be
+#              discerned. Many applications can sniff out the type on
+#              their own, for example Open Office and MS Office.
+# application  as in `open -a 'open-with.app' foo.xls`
+#
+# EXAMPLES
+# A typical `.mailcap` file using `view-attachment` may include:
+#
+#     application/msword; view-attachment %s "-" 'Start\ OpenOffice.org'
+#     application/pdf; view-attachment %s
+#     application/vnd.ms-excel; view-attachment %s "-" 'Start\ OpenOffice.org'
+#     image/gif; view-attachment %s
+#     image/jpeg; view-attachment %s
+#     image/png; view-attachment %s
+#     # HTML isn't always recognised, pass the type explicitly
+#     text/html; view-attachment %s html
+#
+#
+# DEBUGGING
+# If you have problems set DEBUG to 'yes'.  That will cause debug
+# messages to be written to standard error.
+#
+# SEE ALSO:  The man pages for open, file, basename
+
+# AUTHOR:  Eric Gebhart
+#
+
+log() {
+  echo "$@" >&2
+}
+
+debug() {
+  if [ -n "$DEBUG" ]; then
+    log "$@"
+  fi
+}
+
+fatal() {
+  log "$@"
+  exit 1
+}
+
+PROGRAM=$(basename $0)
+# the tmp directory to use.
+tmpdir=`mktmpdir -t $PROGRAM` || exit 1
+
+debug "\$@:'$@'"
+
+# Mutt puts everything in /tmp by default.
+# This gets the basic filename from the full pathname.
+orig_filename="$1"
+type="$2"
+open_with="$3"
+
+# if the type is empty then try to figure it out.
+if [ -z "$type" ]; then
+    type="$(file -bi $orig_filename | cut -d'/' -f2$)"
+fi
+
+debug "type:'$type'"
+
+# if the type is '-' then we don't want to mess with type.
+# Otherwise we are rebuilding the name.  Either from the
+# type that was passed in or from the type we discerned.
+if [ "$type" = "-" ]; then
+    filename="$tmpdir/$(basename $orig_filename)"
+else
+    filename="$tmpdir/$(basename $orig_filename).$type"
+fi
+
+# Copy the file to our new spot so mutt can't delete it
+# before the app has a chance to view it.
+cp "$orig_filename" "$filename"
+
+# If there's no 'open with' then we can let preview do it's thing.
+# Otherwise we've been told what to use.  So do an open -a.
+debug "filename:'$filename' open_with:'$open_with'"
+if [ -z "$open_with" ]; then
+    open "$filename"
+else
+    open -a "$open_with" "$filename"
+fi

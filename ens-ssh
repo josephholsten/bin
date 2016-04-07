@@ -1,0 +1,7 @@
+#!/bin/sh
+export SSH_IDENTITY="$HOME/.ssh/id_rsa-ensighten"
+# export SSH_IDENTITY="/Volumes/Imation USB/.ssh/id_rsa"
+# export SSH_USERNAME="jholsten"
+# export SSH_USERNAME="JHols1"
+export SSH_USERNAME="jhols1"
+exec ssh -v -tt -i "${SSH_IDENTITY}" -l "${SSH_USERNAME}" "$@"

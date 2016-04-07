@@ -4,8 +4,7 @@
 $*
 
 if [ $? -eq 0 ]
-then /usr/local/bin/growlnotify -s -m "$*" "SUCCESS"
-
-else /usr/local/bin/growlnotify -s -m "$* returned $?" "FAIL"
+then terminal-notifier -title "$*" -message "Success"
+else terminal-notifier -title "$*" -message "Fail (returned $?)"
 fi
 beep

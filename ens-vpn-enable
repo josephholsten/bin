@@ -1,0 +1,11 @@
+#!/bin/bash
+
+service="EnsightenVPN"
+
+function isnt_connected () {
+    scutil --nc status "$service" | sed -n 1p | grep -qv Connected
+}
+
+if isnt_connected "$service"; then
+    scutil --nc start "$service"
+fi

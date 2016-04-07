@@ -1,0 +1,129 @@
+#!/usr/bin/env ruby
+
+require 'bitbucket_rest_api'
+require 'thread'
+require 'monitor'
+require 'inifile'
+
+config = IniFile.load(File.expand_path('~/.bitbucket'))
+
+@user = config['auth']['username']
+@pass = config['auth']['password']
+@team = config['auth']['owner']
+
+bb = BitBucket.new(basic_auth: "#{@user}:#{@pass}")
+repos = bb.repos.list.select { |repo| repo['owner'] == @team }
+
+results = []
+results_mutex = Mutex.new
+
+# Set a finite number of simultaneous worker threads that can run
+thread_count = 32
+
+threads = Array.new(thread_count)
+work_queue = SizedQueue.new(thread_count)
+
+# Add a monitor so we can notify when a thread finishes and we can schedule a new one
+# Add a condition variable on the monitored array to tell the consumer to check the thread array
+threads.extend(MonitorMixin)
+threads_available = threads.new_cond
+
+sysexit = false
+
+consumer_thread = Thread.new do
+  loop do
+    # Stop looping when the producer is finished producing work
+    break if sysexit & work_queue.length == 0
+    found_index = nil
+
+    # The MonitorMixin requires us to obtain a lock on the threads array
+    # in case a different thread may try to make changes to it.
+    threads.synchronize do
+      # First, wait on an available spot in the threads array.
+      # This fires every time a signal is sent to the "threads_available" variable
+      threads_available.wait_while do
+        threads.count { |t| t.nil? || t.status == false || t['finished'].nil? == false } == 0
+      end
+      # Once an available spot is found, get the index of that spot so we may use it for the new thread
+      found_index = threads.rindex { |t| t.nil? || t.status == false || t['finished'].nil? == false }
+    end
+
+    # Get a new unit of work from the work queue
+    repo = work_queue.pop
+
+    # Pass the repo variable to the new thread so it can use it as a parameter to go get the exchange rates
+    threads[found_index] = Thread.new(repo['slug']) do
+      # puts "Scanning Followers for #{@team}\\#{repo['slug']}"
+      included = false
+      followers = bb.repos.following.followers(@team, repo['slug'])
+      followers['followers'].each do |follower|
+        included = true if follower['username'] == @user
+      end
+      if included
+        results_mutex.synchronize do
+          requests = bb.repos.pull_request.list(@team, repo['slug'], pagelen: 50)
+          next if requests['values'].empty?
+          requests['values'].each do |req|
+            participants = bb.repos.pull_request.participants(@team, repo['slug'], req['id'], pagelen: 50)
+            approved = participants.count { |p| p['approved'] == true }
+            # To get comment count, we would have to get the list of all commits,
+            # and then the comments for all those commits
+            # Not sure if that is worth it...
+
+            # For self approval, scan teh particiapts for if approved == true again,
+            # but also if our username is the same
+            # Mark the PR as "self_approved" if so
+
+            # Repo URL: "https://bitbucket.org/#{@team}/{repo['slug']}"
+            # Repo Logo: repo['logo']
+            # PR Author Link: req['author']['links']['html']['href']
+            # PR Author Avatar: req['author']['links']['avatar']['href']
+            # PR Author: req['author']['display_name']
+            # PR Link: req['links']['html']['href']
+            slug = repo['slug']
+            author = req['author']['display_name']
+            id = req['id']
+            title = req['title']
+            results << "#{slug}\t#{author}\t\##{id}: #{title}\tApproved: #{approved}"
+          end
+        end
+      end
+
+      # When this thread is finished, mark it as such so the consumer knows it is a free spot in the array.
+      Thread.current['finished'] = true
+
+      # Tell the consumer to check the thread array
+      threads.synchronize do
+        threads_available.signal
+      end
+    end
+  end
+end
+
+producer_thread = Thread.new do
+  # For each repo we need to download...
+  repos.each do |repo|
+    # Put the repo on the work queue
+    work_queue << repo
+
+    # Tell the consumer to check the thread array so it can attempt to schedule the next job if a free spot exists.
+    threads.synchronize do
+      threads_available.signal
+    end
+  end
+  # Tell the consumer that we are finished downloading repos
+  sysexit = true
+end
+
+# Join on both the producer and consumer threads so the main thread doesn't exit while they are doing work.
+producer_thread.join(15)
+consumer_thread.join(15)
+
+# Join on the child processes to allow them to finish (if any are left)
+threads.each do |thread|
+  thread.join unless thread.nil?
+end
+
+results.each do |res|
+  puts res
+end

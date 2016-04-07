@@ -1,2 +1,0 @@
-#!/bin/sh
-route delete 50.16.23.125/32

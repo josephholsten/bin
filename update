@@ -1,3 +1,0 @@
-#!/bin/sh
-cd "$HOME/src/jh/dvm/ansible-cfg"
-bin/run

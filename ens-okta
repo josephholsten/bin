@@ -1,0 +1,3 @@
+#!/bin/sh
+URL="https://ensighten.okta.com/"
+open "${URL}"

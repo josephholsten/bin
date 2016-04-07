@@ -1,16 +1,17 @@
 #!/bin/bash
-
-set -e
-
-# cleanup a git repo, removing fully merged branches (locally and remotely)
+# git-cleanup: cleanup a git repo, removing fully merged branches (locally and remotely)
 # based on http://devblog.springest.com/a-script-to-remove-old-git-branches
 
 # run from the repo to be cleaned
 
+set -e
+
 # TODO: store lists of branches, DRY (don't want list to change after confirm)
 
-COMPARE_BRANCH='master' # branch to compare other branches against
-BRANCHES="master"
+BRANCHES="$@"
+if [ "" = "${BRANCHES}" ]; then
+	BRANCHES="master"
+fi
 
 # Update our list of remotes, fetching new, and pruning stale
 git fetch

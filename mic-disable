@@ -1,0 +1,3 @@
+#!/usr/bin/osascript
+# mic-disable - set system audio input to bin
+tell application "System Events" to set volume input volume 0

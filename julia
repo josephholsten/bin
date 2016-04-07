@@ -1,4 +1,0 @@
-#!/bin/sh
-# julia - ensure julia is run from the right place
-export PATH=/opt/homebrew-cask/Caskroom/julia/0.2.1/Julia-0.2.1.app/Contents/Resources/julia/bin:"$PATH"
-exec julia

@@ -1,0 +1,20 @@
+#!/bin/sh
+# ens-pick-pr:
+
+if [ -n "$DEBUG" ]; then
+  set -x
+fi
+
+if [ $# <= 3 ]
+then
+    echo "usage: ens-pick-pr <slug> <ref> <branch>" >&2
+fi
+slug=$1
+ref=$3
+branch=$2
+
+co ${branch}
+pull
+mkbr ${branch}_${slug}
+pick ${ref}
+ens-pr ${branch}

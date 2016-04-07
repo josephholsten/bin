@@ -1,0 +1,3 @@
+#!/usr/bin/osascript
+# mic-enable - set system audio input to max
+tell application "System Events" to set volume input volume 100

@@ -1,4 +1,0 @@
-#!/bin/sh
-set -x
-: ${PHOTOSDIR:=$HOME/Dropbox/Pictures}
-exec sortphotos -r "$@" "$PHOTOSDIR"

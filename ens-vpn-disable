@@ -1,0 +1,13 @@
+#!/bin/bash
+
+vpn="EnsightenVPN"
+
+function isnt_connected () {
+    scutil --nc status "$vpn" | sed -n 1p | grep -qv Connected
+}
+
+if isnt_connected "$vpn"; then
+    :
+else
+    scutil --nc stop "$vpn"
+fi

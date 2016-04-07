@@ -1,0 +1,41 @@
+#!/bin/sh
+
+if [ -n "$DEBUG" ]; then
+    set -x
+fi
+
+KILLTIMEOUT=1
+TERMTIMEOUT=1
+
+while getopts k:t: f
+do
+    case $f in
+        k) KILLTIMEOUT=$OPTARG;;
+        t) TERMTIMEOUT=$OPTARG;;
+        \?)
+            echo 'usage: timeout [-k dur] [-t dur] cmd' >&2
+            exit 1;;
+    esac
+done
+shift `expr $OPTIND - 1`
+
+PROGRAM="$@"
+
+# TODO: support secondary timout to allow for term v kill distinction
+
+$PROGRAM &
+pid=$!
+
+i=0
+while kill -0 $pid 2> /dev/null; do
+    if [ "$i" -ge "$KILLTIMEOUT" ]; then
+        kill -0 $pid 2> /dev/null &&
+        kill -9 $pid 2> /dev/null &&
+        echo "Timeout threshold met at $KILLTIMEOUT secs" | STDERR &&
+        exit 1
+    fi
+    sleep 1
+    i=`expr $i + 1`
+done
+
+wait $pid

@@ -1,0 +1,26 @@
+#!/bin/sh
+# dns-cache-flush - clear system resolver cache
+# more info at https://support.apple.com/en-us/HT202516
+
+ver=$(sw_vers -productVersion)
+
+case $ver in
+	10.6* )
+		dscacheutil -flushcache
+		;;
+	10.7* | 10.8* | 10.9* )
+		killall -HUP mDNSResponder
+		;;
+	10.10.0 | 10.10.1 | 10.10.2 | 10.10.3 )
+		discoveryutil mdnsflushcache
+		;;
+	10.10.4 | 10.10.5 | 10.11* )
+		killall -HUP mDNSResponder
+		;;
+	*)
+		echo "unknown dns system on version ${ver}, trying my best" >&2
+		dscacheutil -flushcache
+		discoveryutil mdnsflushcache
+		killall -HUP mDNSResponder
+		;;
+esac
