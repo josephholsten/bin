@@ -1,5 +1,0 @@
-#!/bin/sh
-
-cd ~/src/jh/infra/alive.josephholsten.com
-exec bin/update
-

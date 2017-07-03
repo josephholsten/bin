@@ -1,3 +1,0 @@
-#!/bin/sh
-cd "$HOME/Dropbox/src/jh/infra/dvm/ansible-cfg"
-exec bin/run
