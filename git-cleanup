@@ -4,7 +4,7 @@
 
 # run from the repo to be cleaned
 
-set -e
+# set -e
 
 # TODO: store lists of branches, DRY (don't want list to change after confirm)
 

@@ -1,11 +1,36 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
+# yamlfmt - pretty print yaml from files or stdin
 
-import sys
+import fileinput
 import yaml
 import pprint
 
-filename = sys.argv[1]
+def pretty_print(ugly_str, filename):
+    print("filename:", end='')
+    pprint.pprint(filename)
+    print("ugly_str:", end='')
+    pprint.pprint(ugly_str)
+    y = yaml.safe_load(ugly_str)
+    pretty_str = yaml.dump(y, default_flow_style=False)
+    if filename == '<stdin>':
+        print(pretty_str, end='')
+    else:
+        import tempfile
+        import os
+        tmp = tempfile.NamedTemporaryFile(mode='w', prefix='yamlfmt')
+        print(pretty_str, end='', file=tmp)
+        os.unlink(filename)
+        os.link(tmp.name, filename)
 
-y = yaml.safe_load(open(filename, 'r'))
-
-print yaml.dump(y, default_flow_style=False)
+with fileinput.input() as f:
+    ugly_str = ""
+    filename = f.filename()
+    for line in f:
+        if f.isfirstline():
+            # don't bother on the first line of first file
+            if ugly_str != "":
+                process(ugly_str, filename)
+            ugly_str = ""
+            filename = f.filename()
+        ugly_str += line
+    process(ugly_str, filename)
