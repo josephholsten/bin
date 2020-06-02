@@ -1,0 +1,3 @@
+#!/bin/sh
+# awkut: cut(1) using awk fields
+exec awk "{print \$${1}}"
