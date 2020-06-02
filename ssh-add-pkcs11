@@ -1,0 +1,9 @@
+#!/bin/sh
+# ssh-add-pkcs11: add pkcs11 identity to ssh agent
+
+# Note: opensc-pkcs11.so must be in /usr/local/lib, other locations will fail with odd errors
+ssh-add -e /usr/local/lib/opensc-pkcs11.so >> /dev/null
+if [ $? -gt 0 ]; then
+        echo "Failed to remove previous card"
+fi
+ssh-add -s /usr/local/lib/opensc-pkcs11.so
